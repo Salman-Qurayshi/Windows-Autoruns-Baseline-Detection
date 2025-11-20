@@ -108,7 +108,6 @@ Get-Command -Module "AutoRuns (1)"
 
 Once I verified the commands were available, I generated the clean baseline that represented my system before any persistence was added.
 
-Screenshot: `screenshots/baseline-creation.png`
 
 ---
 
@@ -124,7 +123,7 @@ New-AutoRunsBaseLine -Verbose -FilePath .\Baseline.ps1
 
 This created a PowerShell baseline file called `Baseline.ps1` under my baseline directory. This file represented the “known-good” state of my system, and later I used it as the reference point to detect changes.
 
-Screenshot: `screenshots/baseline-creation.png`
+![Baseline Creation](./baseline-creation.png)
 
 ---
 
@@ -134,7 +133,8 @@ To simulate malicious activity, I used my Ubuntu VM running Metasploit. The idea
 
 In my case, I opened Metasploit (`msfconsole`) to simulate an active attacker session and prepared for the next step.
 
-Screenshot: `screenshots/running-msfconsole.png`
+![Running msfconsole](./running-msfconsole.png)
+
 
 Even though I did not rely on Metasploit for the final persistence action, it represents the attacker foothold before persistence modification.
 
@@ -152,7 +152,8 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "Malfile" /t REG
 
 This created a new autorun entry named `Malfile` pointing to a suspicious binary (`notmal.exe`).
 
-Screenshot: `screenshots/running-regadd.png`
+![Running reg add](./runnning-regadd.png)
+
 
 From a SOC perspective, a new entry suddenly appearing in the Run key is already suspicious. If the file is unsigned, lives in a strange directory, or has no publisher information, it becomes an immediate IOC that needs to be investigated.
 
@@ -184,7 +185,8 @@ Compare-AutoRunsBaseline -ReferenceBaselineFile .\Baseline.ps1 -DifferenceBaseli
 
 This command compared all autorun entries from before and after the attacker added persistence. It produced a clear diff, showing exactly what changed.
 
-Screenshot: `screenshots/compare-autoruns.png`
+![Compare Autoruns](./compare-autoruns.png)
+
 
 ---
 
@@ -204,6 +206,7 @@ Publisher     :
 SideIndicator : =>
 ```
 
+
 This immediately stood out because:
 
 - The file lived in a Downloads directory
@@ -213,6 +216,8 @@ This immediately stood out because:
 - The name “Malfile” does not match any legitimate application
 
 The `SideIndicator` arrow showed that this entry existed **only** in the modified baseline, confirming it was introduced after the attacker activity.
+
+
 
 ---
 
